@@ -1,0 +1,193 @@
+-- Flexi-Careers Simplified Database Schema
+-- Guest applications only - No candidate/employer accounts
+
+-- =====================================================
+-- 1. COMPANIES TABLE (Admin managed)
+-- =====================================================
+CREATE TABLE companies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    industry VARCHAR(100),
+    website VARCHAR(255),
+    logo_url VARCHAR(500),
+    size VARCHAR(50), -- startup, small, medium, large, enterprise
+    location VARCHAR(255),
+    founded_year INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =====================================================
+-- 2. JOBS TABLE (Admin managed)
+-- =====================================================
+CREATE TABLE jobs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    requirements TEXT,
+    responsibilities TEXT,
+    salary_min INTEGER,
+    salary_max INTEGER,
+    salary_currency VARCHAR(3) DEFAULT 'USD',
+    salary_type VARCHAR(20) DEFAULT 'hourly', -- hourly, monthly, yearly, project
+    job_type VARCHAR(50) NOT NULL, -- permanent, temporary, contract
+    location VARCHAR(255),
+    is_remote BOOLEAN DEFAULT FALSE,
+    experience_level VARCHAR(50), -- entry, mid, senior, executive
+    hours_per_week VARCHAR(50), -- 10-20, 20-30, 30-40, flexible
+    duration VARCHAR(100), -- ongoing, 3-6 months, 6-12 months, project-based
+    skills TEXT, -- JSON array of skills
+    benefits TEXT,
+    status VARCHAR(20) DEFAULT 'active', -- active, paused, closed, draft
+    posted_date DATE DEFAULT CURRENT_DATE,
+    application_deadline DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- 3. APPLICATIONS TABLE (Guest applications - no user accounts)
+-- =====================================================
+CREATE TABLE applications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    job_id INTEGER NOT NULL,
+    
+    -- Candidate Info (collected each time they apply)
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    
+    -- Application Content
+    cover_letter TEXT,
+    resume_filename VARCHAR(255),
+    resume_file_path VARCHAR(500),
+    resume_file_size INTEGER,
+    
+    -- Application Management
+    status VARCHAR(50) DEFAULT 'submitted', -- submitted, reviewed, interviewing, shortlisted, rejected, hired
+    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at DATETIME,
+    notes TEXT, -- Internal notes from recruiters/hiring managers
+    rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+    interview_scheduled_at DATETIME,
+    
+    -- Admin fields
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- 4. EMPLOYER_REQUESTS TABLE (Contact form submissions only)
+-- =====================================================
+CREATE TABLE employer_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_name VARCHAR(255) NOT NULL,
+    contact_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    role_type VARCHAR(100) NOT NULL, -- executive, technology, marketing, strategy, other
+    time_commitment VARCHAR(50), -- 10-20, 20-30, 30-40, project, flexible
+    timeline VARCHAR(50), -- immediate, 1-2weeks, 1month, flexible
+    requirements TEXT NOT NULL,
+    budget_range VARCHAR(50), -- 50-100, 100-150, 150-200, 200+, project
+    status VARCHAR(50) DEFAULT 'new', -- new, contacted, in_progress, matched, closed
+    priority VARCHAR(20) DEFAULT 'medium', -- low, medium, high, urgent
+    assigned_to VARCHAR(255), -- Staff member handling this request
+    notes TEXT, -- Internal notes
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =====================================================
+-- 5. JOB_SKILLS TABLE (Admin managed - for job requirements)
+-- =====================================================
+CREATE TABLE job_skills (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    job_id INTEGER NOT NULL,
+    skill_name VARCHAR(100) NOT NULL,
+    is_required BOOLEAN DEFAULT TRUE,
+    proficiency_level VARCHAR(20) DEFAULT 'intermediate', -- beginner, intermediate, advanced, expert
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
+    UNIQUE(job_id, skill_name)
+);
+
+-- =====================================================
+-- 6. APPLICATION_STATUS_HISTORY TABLE (Admin audit trail)
+-- =====================================================
+CREATE TABLE application_status_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    application_id INTEGER NOT NULL,
+    old_status VARCHAR(50),
+    new_status VARCHAR(50) NOT NULL,
+    changed_by VARCHAR(255), -- Admin username who made the change
+    notes TEXT,
+    changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- 7. ADMIN_USERS TABLE (Backend management only)
+-- =====================================================
+CREATE TABLE admin_users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    role VARCHAR(50) DEFAULT 'admin', -- admin, recruiter, manager, viewer
+    is_active BOOLEAN DEFAULT TRUE,
+    last_login DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =====================================================
+-- 8. WEBSITE_ANALYTICS TABLE (Track website usage)
+-- =====================================================
+CREATE TABLE website_analytics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    page_url VARCHAR(500) NOT NULL,
+    visitor_ip VARCHAR(45), -- Support IPv6
+    user_agent TEXT,
+    referrer_url VARCHAR(500),
+    session_id VARCHAR(255),
+    action_type VARCHAR(50), -- page_view, job_view, application_submit, contact_submit
+    job_id INTEGER, -- If action relates to a job
+    visited_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE SET NULL
+);
+
+-- =====================================================
+-- INDEXES for Performance
+-- =====================================================
+CREATE INDEX idx_jobs_company_id ON jobs(company_id);
+CREATE INDEX idx_jobs_status ON jobs(status);
+CREATE INDEX idx_jobs_posted_date ON jobs(posted_date);
+CREATE INDEX idx_jobs_location ON jobs(location);
+CREATE INDEX idx_jobs_job_type ON jobs(job_type);
+
+CREATE INDEX idx_applications_job_id ON applications(job_id);
+CREATE INDEX idx_applications_email ON applications(email);
+CREATE INDEX idx_applications_status ON applications(status);
+CREATE INDEX idx_applications_applied_at ON applications(applied_at);
+
+CREATE INDEX idx_employer_requests_status ON employer_requests(status);
+CREATE INDEX idx_employer_requests_created_at ON employer_requests(created_at);
+CREATE INDEX idx_employer_requests_email ON employer_requests(email);
+
+CREATE INDEX idx_job_skills_job_id ON job_skills(job_id);
+CREATE INDEX idx_job_skills_skill_name ON job_skills(skill_name);
+
+CREATE INDEX idx_application_status_history_application_id ON application_status_history(application_id);
+
+CREATE INDEX idx_website_analytics_visited_at ON website_analytics(visited_at);
+CREATE INDEX idx_website_analytics_action_type ON website_analytics(action_type);
+CREATE INDEX idx_website_analytics_job_id ON website_analytics(job_id);

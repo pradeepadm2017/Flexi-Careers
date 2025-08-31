@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Fractional Jobs - Flexi-Careers</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <div class="logo-container">
+                        <div class="logo-icon">💼</div>
+                        <h2>Flexi-Careers</h2>
+                    </div>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html#home" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="jobs.html" class="nav-link active">Browse Jobs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#employer-form" class="nav-link">Find Talent</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#about" class="nav-link">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#contact" class="nav-link">Contact</a>
+                    </li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="jobs-page">
+        <!-- Page Header -->
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">Browse Fractional Opportunities</h1>
+                <p class="page-subtitle">Discover flexible, high-impact roles that match your expertise and career goals.</p>
+            </div>
+        </section>
+
+        <!-- Job Board Section -->
+        <section class="job-board">
+            <div class="container">
+                <!-- Search and Filter Controls -->
+                <div class="job-controls">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <input type="text" id="keyword-search" placeholder="Search jobs, companies, skills..." class="search-input">
+                        </div>
+                        <div class="filter-group">
+                            <select id="location-filter" class="filter-select">
+                                <option value="">All Locations</option>
+                                <option value="remote">Remote</option>
+                                <option value="new-york">New York, NY</option>
+                                <option value="san-francisco">San Francisco, CA</option>
+                                <option value="chicago">Chicago, IL</option>
+                                <option value="boston">Boston, MA</option>
+                                <option value="austin">Austin, TX</option>
+                                <option value="seattle">Seattle, WA</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="type-filter" class="filter-select">
+                                <option value="">All Types</option>
+                                <option value="permanent">Permanent</option>
+                                <option value="temporary">Temporary</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="sort-controls">
+                        <select id="sort-by" class="sort-select">
+                            <option value="date-desc">Latest First</option>
+                            <option value="date-asc">Oldest First</option>
+                            <option value="location">Location A-Z</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Job Results Counter -->
+                <div class="results-info">
+                    <span class="results-count">Showing <span id="job-count">12</span> opportunities</span>
+                </div>
+                
+                <!-- Job Listings -->
+                <div class="job-listings" id="job-listings">
+                    <!-- Jobs will be dynamically inserted here -->
+                </div>
+                
+                <!-- Load More Button -->
+                <div class="load-more-container">
+                    <button class="btn btn-secondary" id="load-more">Load More Jobs</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="jobs-cta">
+            <div class="container">
+                <h2>Ready to Take the Next Step?</h2>
+                <p>Join thousands of professionals who have found their perfect fractional role through Flexi-Careers.</p>
+                <div class="cta-buttons">
+                    <a href="index.html#employer-form" class="btn btn-secondary">Post a Job</a>
+                    <a href="index.html#contact" class="btn btn-primary">Get Support</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="logo-icon">💼</div>
+                        <h3>Flexi-Careers</h3>
+                    </div>
+                    <p>Connecting talent with opportunity.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>For Job Seekers</h4>
+                        <ul>
+                            <li><a href="jobs.html">Browse Jobs</a></li>
+                            <li><a href="index.html#how-it-works">How It Works</a></li>
+                            <li><a href="index.html#benefits">Why Fractional</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>For Employers</h4>
+                        <ul>
+                            <li><a href="index.html#employer-form">Find Talent</a></li>
+                            <li><a href="index.html#benefits">Benefits</a></li>
+                            <li><a href="index.html#contact">Get Started</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="index.html#about">About</a></li>
+                            <li><a href="index.html#contact">Contact</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Flexi-Careers. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Job Detail Modal -->
+    <div id="jobModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalJobTitle">Job Title</h2>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="modal-job-info">
+                    <div class="modal-company" id="modalCompany">Company Name</div>
+                    <div class="modal-meta">
+                        <div class="modal-meta-item">
+                            <span class="icon">📍</span>
+                            <span id="modalLocation">Location</span>
+                        </div>
+                        <div class="modal-meta-item">
+                            <span class="icon">💰</span>
+                            <span id="modalSalary">Salary</span>
+                        </div>
+                        <div class="modal-meta-item">
+                            <span class="icon">💼</span>
+                            <span id="modalType">Type</span>
+                        </div>
+                        <div class="modal-meta-item">
+                            <span class="icon">🕐</span>
+                            <span id="modalPosted">Posted Date</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Job Description</h3>
+                    <p id="modalDescription">Job description will appear here...</p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Key Requirements</h3>
+                    <ul id="modalRequirements">
+                        <li>Requirement 1</li>
+                        <li>Requirement 2</li>
+                        <li>Requirement 3</li>
+                    </ul>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Skills & Technologies</h3>
+                    <div class="modal-tags" id="modalTags">
+                        <!-- Tags will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-btn" onclick="closeModal()">Close</button>
+                <button class="btn btn-primary modal-btn" id="modalApplyBtn">Apply Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Form Modal -->
+    <div id="applicationModal" class="modal">
+        <div class="modal-content application-modal">
+            <div class="modal-header">
+                <h2 id="applicationJobTitle">Apply for Position</h2>
+                <span class="modal-close" onclick="closeApplicationModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="applicationForm" class="application-form">
+                    <input type="hidden" id="applicationJobId" name="jobId" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resume">Resume *</label>
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+                        <small class="form-help">Accepted formats: PDF, DOC, DOCX (Max 5MB)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="coverLetter">Cover Letter</label>
+                        <textarea id="coverLetter" name="coverLetter" rows="6" placeholder="Tell us why you're the perfect fit for this role..."></textarea>
+                        <small class="form-help">Optional - but helps us understand your motivation</small>
+                    </div>
+                    
+                    <div class="application-job-info">
+                        <h4>Position Details:</h4>
+                        <div class="application-job-summary">
+                            <div class="application-job-title" id="applicationJobTitleSummary"></div>
+                            <div class="application-job-company" id="applicationJobCompany"></div>
+                            <div class="application-job-location" id="applicationJobLocation"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-btn" onclick="closeApplicationModal()">Cancel</button>
+                <button type="button" class="btn btn-primary modal-btn" id="submitApplicationBtn">Submit Application</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+        ↑
+    </button>
+
+    <script src="jobs-backend.js"></script>
+</body>
+</html>

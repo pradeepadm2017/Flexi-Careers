@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Flexi-Careers</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="header-container">
+            <div class="logo">
+                <h1><i class="fas fa-briefcase"></i> Flexi-Careers Admin</h1>
+            </div>
+            <div class="user-menu">
+                <span class="admin-name">Welcome, <strong id="admin-name">System Administrator</strong></span>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <nav class="admin-sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="#dashboard" onclick="showSection('dashboard')">
+                        <i class="fas fa-chart-dashboard"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#companies" onclick="showSection('companies')">
+                        <i class="fas fa-building"></i> Companies
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#jobs" onclick="showSection('jobs')">
+                        <i class="fas fa-briefcase"></i> Jobs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#applications" onclick="showSection('applications')">
+                        <i class="fas fa-file-alt"></i> Applications
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#staff" onclick="showSection('staff')">
+                        <i class="fas fa-users"></i> Staff Management
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#employer-requests" onclick="showSection('employer-requests')">
+                        <i class="fas fa-handshake"></i> Employer Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#analytics" onclick="showSection('analytics')">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="admin-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-dashboard"></i> Dashboard Overview</h2>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-companies">0</h3>
+                            <p>Total Companies</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="active-jobs">0</h3>
+                            <p>Active Jobs</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-applications">0</h3>
+                            <p>Total Applications</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="pending-requests">0</h3>
+                            <p>Pending Requests</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-widgets">
+                    <div class="widget">
+                        <h3><i class="fas fa-clock"></i> Recent Applications</h3>
+                        <div id="recent-applications" class="activity-list">
+                            <!-- Recent applications will be loaded here -->
+                        </div>
+                        <a href="#applications" class="widget-link" onclick="showSection('applications')">View All Applications</a>
+                    </div>
+                    
+                    <div class="widget">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Urgent Employer Requests</h3>
+                        <div id="urgent-requests" class="activity-list">
+                            <!-- Urgent requests will be loaded here -->
+                        </div>
+                        <a href="#employer-requests" class="widget-link" onclick="showSection('employer-requests')">View All Requests</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Companies Section -->
+            <section id="companies" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-building"></i> Company Management</h2>
+                    <button class="btn btn-primary" onclick="showAddCompanyModal()">
+                        <i class="fas fa-plus"></i> Add Company
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Industry</th>
+                                <th>Location</th>
+                                <th>Jobs Posted</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="companies-table">
+                            <!-- Company data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Jobs Section -->
+            <section id="jobs" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-briefcase"></i> Job Management</h2>
+                    <button class="btn btn-primary" onclick="showAddJobModal()">
+                        <i class="fas fa-plus"></i> Post Job
+                    </button>
+                </div>
+                
+                <div class="filters">
+                    <select id="job-status-filter" onchange="filterJobs()">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="paused">Paused</option>
+                        <option value="closed">Closed</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Posted Date</th>
+                                <th>Applications</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jobs-table">
+                            <!-- Job data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Applications Section -->
+            <section id="applications" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-alt"></i> Application Management</h2>
+                </div>
+                
+                <div class="filters">
+                    <select id="application-status-filter" onchange="filterApplications()">
+                        <option value="all">All Status</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="interviewing">Interviewing</option>
+                        <option value="shortlisted">Shortlisted</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="hired">Hired</option>
+                    </select>
+                    <select id="application-job-filter" onchange="filterApplications()">
+                        <option value="all">All Jobs</option>
+                        <!-- Job options will be loaded here -->
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Applied Date</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applications-table">
+                            <!-- Application data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Staff Management Section -->
+            <section id="staff" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Staff Management</h2>
+                    <button class="btn btn-primary" onclick="showAddStaffModal()">
+                        <i class="fas fa-user-plus"></i> Add Staff Member
+                    </button>
+                </div>
+                
+                <div class="filters">
+                    <select id="staff-status-filter" onchange="filterStaff()">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <select id="staff-role-filter" onchange="filterStaff()">
+                        <option value="all">All Roles</option>
+                        <option value="admin">Administrator</option>
+                        <option value="manager">Manager</option>
+                        <option value="recruiter">Recruiter</option>
+                        <option value="coordinator">Coordinator</option>
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                                <th>Permissions</th>
+                                <th>Status</th>
+                                <th>Hire Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-table">
+                            <!-- Staff data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Employer Requests Section -->
+            <section id="employer-requests" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-handshake"></i> Employer Requests</h2>
+                </div>
+                
+                <div class="filters">
+                    <select id="request-status-filter" onchange="filterRequests()">
+                        <option value="all">All Status</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="matched">Matched</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                    <select id="request-priority-filter" onchange="filterRequests()">
+                        <option value="all">All Priority</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <select id="request-assigned-filter" onchange="filterRequests()">
+                        <option value="all">All Staff</option>
+                        <option value="unassigned">Unassigned</option>
+                        <!-- Staff options will be loaded dynamically -->
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Contact</th>
+                                <th>Role Type</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requests-table">
+                            <!-- Request data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> Platform Analytics</h2>
+                </div>
+                
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Application Status Distribution</h3>
+                        <div id="status-chart" class="chart-container">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Most Popular Jobs</h3>
+                        <div id="popular-jobs" class="chart-container">
+                            <!-- Popular jobs list will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Skills in Demand</h3>
+                        <div id="skills-demand" class="chart-container">
+                            <!-- Skills demand chart will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Website Traffic</h3>
+                        <div id="traffic-stats" class="chart-container">
+                            <!-- Traffic statistics will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Company Modal -->
+    <div id="add-company-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-building"></i> Add New Company</h3>
+                <span class="close" onclick="closeModal('add-company-modal')">&times;</span>
+            </div>
+            <form id="add-company-form" class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="company-name">Company Name *</label>
+                        <input type="text" id="company-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company-industry">Industry</label>
+                        <input type="text" id="company-industry" name="industry">
+                    </div>
+                    <div class="form-group">
+                        <label for="company-website">Website</label>
+                        <input type="url" id="company-website" name="website">
+                    </div>
+                    <div class="form-group">
+                        <label for="company-size">Company Size</label>
+                        <select id="company-size" name="size">
+                            <option value="">Select Size</option>
+                            <option value="startup">Startup</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                            <option value="enterprise">Enterprise</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="company-location">Location</label>
+                        <input type="text" id="company-location" name="location">
+                    </div>
+                    <div class="form-group">
+                        <label for="company-founded">Founded Year</label>
+                        <input type="number" id="company-founded" name="founded_year" min="1800" max="2024">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="company-description">Description</label>
+                        <textarea id="company-description" name="description" rows="4"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="company-logo">Logo URL</label>
+                        <input type="url" id="company-logo" name="logo_url">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-company-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Company</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Job Modal -->
+    <div id="add-job-modal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-briefcase"></i> Post New Job</h3>
+                <span class="close" onclick="closeModal('add-job-modal')">&times;</span>
+            </div>
+            <form id="add-job-form" class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="job-title">Job Title *</label>
+                        <input type="text" id="job-title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-company">Company *</label>
+                        <select id="job-company" name="company_id" required>
+                            <option value="">Select Company</option>
+                            <!-- Companies will be loaded here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-type">Job Type *</label>
+                        <select id="job-type" name="job_type" required>
+                            <option value="">Select Type</option>
+                            <option value="permanent">Permanent</option>
+                            <option value="temporary">Temporary</option>
+                            <option value="contract">Contract</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-location">Location</label>
+                        <input type="text" id="job-location" name="location">
+                    </div>
+                    <div class="form-group">
+                        <label for="job-remote">Remote Work</label>
+                        <select id="job-remote" name="is_remote">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-experience">Experience Level</label>
+                        <select id="job-experience" name="experience_level">
+                            <option value="">Select Level</option>
+                            <option value="entry">Entry Level</option>
+                            <option value="mid">Mid Level</option>
+                            <option value="senior">Senior Level</option>
+                            <option value="executive">Executive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-hours">Hours per Week</label>
+                        <input type="text" id="job-hours" name="hours_per_week" placeholder="e.g., 20-30, flexible">
+                    </div>
+                    <div class="form-group">
+                        <label for="job-duration">Duration</label>
+                        <input type="text" id="job-duration" name="duration" placeholder="e.g., ongoing, 3-6 months">
+                    </div>
+                    <div class="form-group">
+                        <label for="job-salary-min">Min Salary</label>
+                        <input type="number" id="job-salary-min" name="salary_min" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="job-salary-max">Max Salary</label>
+                        <input type="number" id="job-salary-max" name="salary_max" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="job-salary-type">Salary Type</label>
+                        <select id="job-salary-type" name="salary_type">
+                            <option value="hourly">Hourly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="project">Project</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="job-deadline">Application Deadline</label>
+                        <input type="date" id="job-deadline" name="application_deadline">
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="job-description">Job Description *</label>
+                    <textarea id="job-description" name="description" rows="6" required></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="job-requirements">Requirements</label>
+                    <textarea id="job-requirements" name="requirements" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="job-responsibilities">Responsibilities</label>
+                    <textarea id="job-responsibilities" name="responsibilities" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="job-benefits">Benefits</label>
+                    <textarea id="job-benefits" name="benefits" rows="3"></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-job-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Post Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Application Modal -->
+    <div id="view-application-modal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> Application Details</h3>
+                <span class="close" onclick="closeModal('view-application-modal')">&times;</span>
+            </div>
+            <div id="application-details" class="modal-body">
+                <!-- Application details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- View Employer Request Modal -->
+    <div id="view-request-modal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-handshake"></i> Employer Request Details</h3>
+                <span class="close" onclick="closeModal('view-request-modal')">&times;</span>
+            </div>
+            <div id="request-details" class="modal-body">
+                <!-- Request details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Staff Modal -->
+    <div id="add-staff-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Add New Staff Member</h3>
+                <span class="close" onclick="closeModal('add-staff-modal')">&times;</span>
+            </div>
+            <form id="add-staff-form" class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="staff-first-name">First Name *</label>
+                        <input type="text" id="staff-first-name" name="first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-last-name">Last Name *</label>
+                        <input type="text" id="staff-last-name" name="last_name" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="staff-email">Email *</label>
+                        <input type="email" id="staff-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-phone">Phone</label>
+                        <input type="tel" id="staff-phone" name="phone">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="staff-role">Role *</label>
+                        <select id="staff-role" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="System Administrator">System Administrator</option>
+                            <option value="Talent Acquisition Manager">Talent Acquisition Manager</option>
+                            <option value="Senior Recruiter">Senior Recruiter</option>
+                            <option value="Recruiter">Recruiter</option>
+                            <option value="Client Success Manager">Client Success Manager</option>
+                            <option value="Operations Coordinator">Operations Coordinator</option>
+                            <option value="HR Specialist">HR Specialist</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-department">Department</label>
+                        <select id="staff-department" name="department">
+                            <option value="">Select Department</option>
+                            <option value="Administration">Administration</option>
+                            <option value="Talent Acquisition">Talent Acquisition</option>
+                            <option value="Client Success">Client Success</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Human Resources">Human Resources</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="staff-hire-date">Hire Date</label>
+                        <input type="date" id="staff-hire-date" name="hire_date">
+                    </div>
+                    <div class="form-group">
+                        <label for="staff-status">Status</label>
+                        <select id="staff-status" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="staff-can-assign" name="can_assign_requests">
+                            <label for="staff-can-assign">Can assign employer requests</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="staff-is-admin" name="is_admin">
+                            <label for="staff-is-admin">Administrator privileges</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="staff-create-login" name="create_login_account">
+                            <label for="staff-create-login">Create login account</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="login-details" class="form-section" style="display: none;">
+                    <h4>Login Account Details</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="staff-username">Username</label>
+                            <input type="text" id="staff-username" name="username" placeholder="Auto-generated from email if empty">
+                        </div>
+                        <div class="form-group">
+                            <label for="staff-password">Password</label>
+                            <input type="password" id="staff-password" name="password" placeholder="Default: password123">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-staff-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Staff Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Staff Details Modal -->
+    <div id="view-staff-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user"></i> Staff Member Details</h3>
+                <span class="close" onclick="closeModal('view-staff-modal')">&times;</span>
+            </div>
+            <div id="staff-details" class="modal-body">
+                <!-- Staff details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>
