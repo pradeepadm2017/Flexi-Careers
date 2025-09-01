@@ -6,8 +6,8 @@ Flask application providing REST API for the public website
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import psycopg
+from psycopg.rows import dict_row
 import os
 import json
 from datetime import datetime
@@ -37,9 +37,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def get_db_connection():
     """Create database connection"""
     try:
-        conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+        conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
         return conn
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         logger.error(f"Database connection error: {e}")
         return None
 
