@@ -420,6 +420,29 @@ def get_companies():
         logger.error(f"Error fetching companies: {e}")
         return jsonify({'error': 'Failed to fetch companies'}), 500
 
+@app.route('/api/test', methods=['GET'])
+def test_connection():
+    """Test database connection"""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+            
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) as count FROM jobs WHERE status = %s", ('active',))
+        result = cursor.fetchone()
+        conn.close()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Database connection working',
+            'active_jobs': result['count']
+        })
+        
+    except Exception as e:
+        logger.error(f"Test connection error: {e}")
+        return jsonify({'error': f'Database test failed: {str(e)}'}), 500
+
 @app.route('/api/stats', methods=['GET'])
 def get_platform_stats():
     """Get platform statistics for homepage"""
