@@ -179,12 +179,10 @@ def get_job_details(job_id):
                 c.size as company_size,
                 c.location as company_location,
                 c.founded_year,
-                COUNT(a.id) as application_count
+                0 as application_count
             FROM jobs j
             JOIN companies c ON j.company_id = c.id
-            LEFT JOIN applications a ON j.id = a.job_id
             WHERE j.id = %s AND j.status = 'active'
-            GROUP BY j.id
         """, (job_id,))
         
         job = cursor.fetchone()
