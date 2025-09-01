@@ -101,10 +101,9 @@ def get_jobs():
                 c.logo_url as company_logo,
                 c.size as company_size,
                 c.location as company_location,
-                COUNT(a.id) as application_count
+                0 as application_count
             FROM jobs j
             JOIN companies c ON j.company_id = c.id
-            LEFT JOIN applications a ON j.id = a.job_id
             WHERE j.status = 'active'
         """
         
@@ -125,7 +124,7 @@ def get_jobs():
         if is_remote == 'true':
             query += " AND j.is_remote = true"
             
-        query += " GROUP BY j.id ORDER BY j.posted_date DESC"
+        query += " ORDER BY j.posted_date DESC"
         
         cursor.execute(query, params)
         jobs = cursor.fetchall()
@@ -285,6 +284,7 @@ def apply_for_job(job_id):
                 job_id, first_name, last_name, email, phone, 
                 cover_letter, resume_filename, status, applied_at
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, 'submitted', %s)
+            RETURNING id
         """, (
             job_id,
             data['first_name'],
@@ -296,7 +296,7 @@ def apply_for_job(job_id):
             datetime.now().isoformat()
         ))
         
-        application_id = cursor.lastrowid
+        application_id = cursor.fetchone()[0]
         
         # Add to application status history
         cursor.execute("""
@@ -354,6 +354,7 @@ def submit_employer_request():
                 time_commitment, timeline, requirements, budget_range,
                 status, priority, created_at
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'new', 'medium', %s)
+            RETURNING id
         """, (
             data['company_name'],
             data['contact_name'],
@@ -368,7 +369,7 @@ def submit_employer_request():
             datetime.now().isoformat()
         ))
         
-        request_id = cursor.lastrowid
+        request_id = cursor.fetchone()[0]
         
         conn.commit()
         conn.close()
@@ -471,7 +472,7 @@ def get_platform_stats():
         # Recent applications (last 30 days)
         cursor.execute("""
             SELECT COUNT(*) FROM applications 
-            WHERE date(applied_at) >= date('now', '-30 days')
+            WHERE applied_at >= CURRENT_DATE - INTERVAL '30 days'
         """)
         stats['recent_applications'] = cursor.fetchone()[0]
         
