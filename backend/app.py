@@ -296,7 +296,11 @@ def apply_for_job(job_id):
             datetime.now().isoformat()
         ))
         
-        application_id = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        application_id = result['id'] if result else None
+        
+        if not application_id:
+            raise Exception("Failed to get application ID after insert")
         
         # Add to application status history
         cursor.execute("""
