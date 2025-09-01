@@ -192,25 +192,16 @@ def get_job_details(job_id):
             
         job_dict = dict(job)
         
-        # Parse skills JSON if exists
-        if job_dict['skills']:
-            try:
-                job_dict['skills'] = json.loads(job_dict['skills'])
-            except:
-                job_dict['skills'] = []
+        # Parse skills from comma-separated string
+        skills_raw = job_dict['skills']
+        if skills_raw and isinstance(skills_raw, str):
+            # Split comma-separated skills into list
+            skills_list = [skill.strip() for skill in skills_raw.split(',') if skill.strip()]
+            job_dict['skills'] = skills_list
+            job_dict['required_skills'] = [{'skill_name': skill, 'is_required': True, 'proficiency_level': 'intermediate'} for skill in skills_list]
         else:
             job_dict['skills'] = []
-        
-        # Get job skills from job_skills table
-        cursor.execute("""
-            SELECT skill_name, is_required, proficiency_level
-            FROM job_skills
-            WHERE job_id = %s
-            ORDER BY is_required DESC, skill_name
-        """, (job_id,))
-        
-        skills_required = cursor.fetchall()
-        job_dict['required_skills'] = [dict(skill) for skill in skills_required]
+            job_dict['required_skills'] = []
         
         conn.close()
         
