@@ -443,8 +443,9 @@ def test_connection():
         
         return jsonify({
             'success': True, 
-            'message': 'Database connection working',
-            'active_jobs': result['count']
+            'message': 'Database connection working - VERSION 2',
+            'active_jobs': result['count'],
+            'version': 'application-debug-v2'
         })
         
     except Exception as e:
