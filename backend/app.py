@@ -111,19 +111,19 @@ def get_jobs():
         params = []
         
         if location:
-            query += " AND (j.location LIKE ? OR j.is_remote = 1)"
+            query += " AND (j.location LIKE %s OR j.is_remote = true)"
             params.append(f"%{location}%")
             
         if job_type:
-            query += " AND j.job_type = ?"
+            query += " AND j.job_type = %s"
             params.append(job_type)
             
         if experience_level:
-            query += " AND j.experience_level = ?"
+            query += " AND j.experience_level = %s"
             params.append(experience_level)
             
         if is_remote == 'true':
-            query += " AND j.is_remote = 1"
+            query += " AND j.is_remote = true"
             
         query += " GROUP BY j.id ORDER BY j.posted_date DESC"
         
@@ -184,7 +184,7 @@ def get_job_details(job_id):
             FROM jobs j
             JOIN companies c ON j.company_id = c.id
             LEFT JOIN applications a ON j.id = a.job_id
-            WHERE j.id = ? AND j.status = 'active'
+            WHERE j.id = %s AND j.status = 'active'
             GROUP BY j.id
         """, (job_id,))
         
@@ -208,7 +208,7 @@ def get_job_details(job_id):
         cursor.execute("""
             SELECT skill_name, is_required, proficiency_level
             FROM job_skills
-            WHERE job_id = ?
+            WHERE job_id = %s
             ORDER BY is_required DESC, skill_name
         """, (job_id,))
         
@@ -237,7 +237,7 @@ def apply_for_job(job_id):
         cursor = conn.cursor()
         
         # Check if job exists and is active
-        cursor.execute("SELECT id FROM jobs WHERE id = ? AND status = 'active'", (job_id,))
+        cursor.execute("SELECT id FROM jobs WHERE id = %s AND status = 'active'", (job_id,))
         if not cursor.fetchone():
             return jsonify({'error': 'Job not found or no longer active'}), 404
         
@@ -284,7 +284,7 @@ def apply_for_job(job_id):
             INSERT INTO applications (
                 job_id, first_name, last_name, email, phone, 
                 cover_letter, resume_filename, status, applied_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, 'submitted', ?)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, 'submitted', %s)
         """, (
             job_id,
             data['first_name'],
@@ -302,7 +302,7 @@ def apply_for_job(job_id):
         cursor.execute("""
             INSERT INTO application_status_history (
                 application_id, old_status, new_status, changed_by, notes, changed_at
-            ) VALUES (?, NULL, 'submitted', 'system', 'Application submitted via website', ?)
+            ) VALUES (%s, NULL, 'submitted', 'system', 'Application submitted via website', %s)
         """, (application_id, datetime.now().isoformat()))
         
         conn.commit()
@@ -353,7 +353,7 @@ def submit_employer_request():
                 company_name, contact_name, email, phone, role_type, role_title,
                 time_commitment, timeline, requirements, budget_range,
                 status, priority, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', 'medium', ?)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'new', 'medium', %s)
         """, (
             data['company_name'],
             data['contact_name'],
@@ -586,7 +586,7 @@ def login():
             FROM admin_users au
             LEFT JOIN staff s ON au.id = s.user_id
             LEFT JOIN employer_access ea ON au.id = ea.admin_user_id
-            WHERE (au.username = ? OR au.email = ?) AND au.is_active = TRUE
+            WHERE (au.username = %s OR au.email = %s) AND au.is_active = TRUE
         """, (username, username))
         
         user = cursor.fetchone()
@@ -608,7 +608,7 @@ def login():
             
             # Update last login
             cursor.execute("""
-                UPDATE admin_users SET last_login = ? WHERE id = ?
+                UPDATE admin_users SET last_login = %s WHERE id = %s
             """, (datetime.now().isoformat(), user[0]))
             
             conn.commit()
@@ -704,7 +704,7 @@ def create_staff():
         cursor = conn.cursor()
         
         # Check if email already exists
-        cursor.execute("SELECT id FROM staff WHERE email = ?", (data['email'],))
+        cursor.execute("SELECT id FROM staff WHERE email = %s", (data['email'],))
         if cursor.fetchone():
             return jsonify({'error': 'Staff member with this email already exists'}), 400
         
@@ -715,13 +715,13 @@ def create_staff():
             password = data.get('password', 'password123')
             
             # Check if username already exists
-            cursor.execute("SELECT id FROM admin_users WHERE username = ? OR email = ?", (username, data['email']))
+            cursor.execute("SELECT id FROM admin_users WHERE username = %s OR email = %s", (username, data['email']))
             if cursor.fetchone():
                 return jsonify({'error': 'Username or email already exists in admin users'}), 400
             
             cursor.execute("""
                 INSERT INTO admin_users (username, email, password_hash, first_name, last_name, role)
-                VALUES (?, ?, ?, ?, ?, 'staff')
+                VALUES (%s, %s, %s, %s, %s, 'staff')
             """, (username, data['email'], hash_password(password), data['first_name'], data['last_name']))
             
             user_id = cursor.lastrowid
@@ -731,7 +731,7 @@ def create_staff():
             INSERT INTO staff (
                 first_name, last_name, email, phone, role, department, hire_date,
                 can_assign_requests, is_admin, user_id, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'active')
         """, (
             data['first_name'],
             data['last_name'],
@@ -775,7 +775,7 @@ def update_staff(staff_id):
         cursor = conn.cursor()
         
         # Check if staff member exists
-        cursor.execute("SELECT id, user_id FROM staff WHERE id = ?", (staff_id,))
+        cursor.execute("SELECT id, user_id FROM staff WHERE id = %s", (staff_id,))
         staff_record = cursor.fetchone()
         if not staff_record:
             return jsonify({'error': 'Staff member not found'}), 404
@@ -785,10 +785,10 @@ def update_staff(staff_id):
         # Update staff record
         cursor.execute("""
             UPDATE staff SET 
-                first_name = ?, last_name = ?, email = ?, phone = ?, role = ?,
-                department = ?, hire_date = ?, can_assign_requests = ?, is_admin = ?,
-                status = ?, updated_at = ?
-            WHERE id = ?
+                first_name = %s, last_name = %s, email = %s, phone = %s, role = %s,
+                department = %s, hire_date = %s, can_assign_requests = %s, is_admin = %s,
+                status = %s, updated_at = %s
+            WHERE id = %s
         """, (
             data.get('first_name', ''),
             data.get('last_name', ''),
@@ -808,8 +808,8 @@ def update_staff(staff_id):
         if current_user_id:
             cursor.execute("""
                 UPDATE admin_users SET 
-                    email = ?, first_name = ?, last_name = ?, updated_at = ?
-                WHERE id = ?
+                    email = %s, first_name = %s, last_name = %s, updated_at = %s
+                WHERE id = %s
             """, (
                 data.get('email', ''),
                 data.get('first_name', ''),
@@ -841,7 +841,7 @@ def delete_staff(staff_id):
         cursor = conn.cursor()
         
         # Check if staff member exists and get user_id
-        cursor.execute("SELECT id, user_id, first_name, last_name FROM staff WHERE id = ?", (staff_id,))
+        cursor.execute("SELECT id, user_id, first_name, last_name FROM staff WHERE id = %s", (staff_id,))
         staff_record = cursor.fetchone()
         if not staff_record:
             return jsonify({'error': 'Staff member not found'}), 404
@@ -850,7 +850,7 @@ def delete_staff(staff_id):
         staff_name = f"{staff_record[2]} {staff_record[3]}"
         
         # Check if staff has assigned requests
-        cursor.execute("SELECT COUNT(*) FROM employer_requests WHERE assigned_to = ?", (staff_name,))
+        cursor.execute("SELECT COUNT(*) FROM employer_requests WHERE assigned_to = %s", (staff_name,))
         assigned_count = cursor.fetchone()[0]
         
         if assigned_count > 0:
@@ -859,11 +859,11 @@ def delete_staff(staff_id):
             }), 400
         
         # Delete staff record
-        cursor.execute("DELETE FROM staff WHERE id = ?", (staff_id,))
+        cursor.execute("DELETE FROM staff WHERE id = %s", (staff_id,))
         
         # Optionally delete associated admin user
         if user_id:
-            cursor.execute("DELETE FROM admin_users WHERE id = ?", (user_id,))
+            cursor.execute("DELETE FROM admin_users WHERE id = %s", (user_id,))
         
         conn.commit()
         conn.close()
@@ -936,7 +936,7 @@ def update_application_status(app_id):
         cursor = conn.cursor()
         
         # Get current status
-        cursor.execute("SELECT status FROM applications WHERE id = ?", (app_id,))
+        cursor.execute("SELECT status FROM applications WHERE id = %s", (app_id,))
         result = cursor.fetchone()
         if not result:
             return jsonify({'error': 'Application not found'}), 404
@@ -946,15 +946,15 @@ def update_application_status(app_id):
         # Update application status
         cursor.execute("""
             UPDATE applications 
-            SET status = ?, updated_at = ?
-            WHERE id = ?
+            SET status = %s, updated_at = %s
+            WHERE id = %s
         """, (new_status, datetime.now().isoformat(), app_id))
         
         # Add to status history
         cursor.execute("""
             INSERT INTO application_status_history 
             (application_id, old_status, new_status, changed_by, notes, changed_at)
-            VALUES (?, ?, ?, 'admin', ?, ?)
+            VALUES (%s, %s, %s, 'admin', %s, %s)
         """, (app_id, old_status, new_status, notes, datetime.now().isoformat()))
         
         conn.commit()
@@ -985,7 +985,7 @@ def assign_employer_request(request_id):
         cursor = conn.cursor()
         
         # Verify staff member exists
-        cursor.execute("SELECT first_name, last_name FROM staff WHERE id = ? AND status = 'active'", (staff_id,))
+        cursor.execute("SELECT first_name, last_name FROM staff WHERE id = %s AND status = 'active'", (staff_id,))
         staff_member = cursor.fetchone()
         if not staff_member:
             return jsonify({'error': 'Staff member not found'}), 404
@@ -993,8 +993,8 @@ def assign_employer_request(request_id):
         # Update employer request
         cursor.execute("""
             UPDATE employer_requests 
-            SET assigned_to = ?, notes = ?, updated_at = ?
-            WHERE id = ?
+            SET assigned_to = %s, notes = %s, updated_at = %s
+            WHERE id = %s
         """, (f"{staff_member[0]} {staff_member[1]}", notes, datetime.now().isoformat(), request_id))
         
         conn.commit()
@@ -1038,17 +1038,17 @@ def get_admin_employer_requests():
             if assigned_staff == 'unassigned':
                 query += " AND (er.assigned_to IS NULL OR er.assigned_to = '')"
             else:
-                query += " AND er.assigned_to = ?"
+                query += " AND er.assigned_to = %s"
                 params.append(assigned_staff)
         
         # Filter by status
         if status_filter:
-            query += " AND er.status = ?"
+            query += " AND er.status = %s"
             params.append(status_filter)
         
         # Filter by priority
         if priority_filter:
-            query += " AND er.priority = ?"
+            query += " AND er.priority = %s"
             params.append(priority_filter)
         
         query += " ORDER BY er.created_at DESC"
