@@ -235,7 +235,14 @@ def apply_for_job(job_id):
         
         # Get form data (handles both JSON and FormData)
         if request.content_type and 'application/json' in request.content_type:
-            data = request.get_json()
+            raw_data = request.get_json()
+            data = {
+                'first_name': raw_data.get('firstName') or raw_data.get('first_name'),
+                'last_name': raw_data.get('lastName') or raw_data.get('last_name'), 
+                'email': raw_data.get('email'),
+                'phone': raw_data.get('phone'),
+                'cover_letter': raw_data.get('coverLetter') or raw_data.get('cover_letter')
+            }
             resume_file = None
         else:
             # Handle FormData
@@ -310,8 +317,11 @@ def apply_for_job(job_id):
         })
         
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
         logger.error(f"Error submitting application: {e}")
-        return jsonify({'error': 'Failed to submit application'}), 500
+        logger.error(f"Traceback: {error_details}")
+        return jsonify({'error': f'Failed to submit application: {str(e)}'}), 500
 
 @app.route('/api/employer-request', methods=['POST'])
 def submit_employer_request():
