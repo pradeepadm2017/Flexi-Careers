@@ -108,7 +108,7 @@ class AdminPanel {
     async loadRealApplications() {
         try {
             // Load applications from API
-            const response = await fetch('http://localhost:5000/admin/api/applications');
+            const response = await fetch('https://flexi-careers.onrender.com/admin/api/applications');
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
@@ -135,7 +135,7 @@ class AdminPanel {
     async loadRealEmployerRequests() {
         try {
             // Load employer requests from API
-            const response = await fetch('http://localhost:5000/admin/api/employer-requests');
+            const response = await fetch('https://flexi-careers.onrender.com/admin/api/employer-requests');
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
@@ -158,7 +158,7 @@ class AdminPanel {
     // Load staff members from API and update UI
     async loadStaff() {
         try {
-            const response = await fetch('http://localhost:5000/admin/api/staff');
+            const response = await fetch('https://flexi-careers.onrender.com/admin/api/staff');
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
@@ -308,8 +308,8 @@ class AdminPanel {
 
         try {
             const url = this.editingStaffId ? 
-                `http://localhost:5000/admin/api/staff/${this.editingStaffId}` : 
-                'http://localhost:5000/admin/api/staff';
+                `https://flexi-careers.onrender.com/admin/api/staff/${this.editingStaffId}` : 
+                'https://flexi-careers.onrender.com/admin/api/staff';
             
             const method = this.editingStaffId ? 'PUT' : 'POST';
             
@@ -475,7 +475,7 @@ class AdminPanel {
 
         if (confirm(`Are you sure you want to delete ${staff.first_name} ${staff.last_name}? This action cannot be undone.`)) {
             try {
-                const response = await fetch(`http://localhost:5000/admin/api/staff/${staffId}`, {
+                const response = await fetch(`https://flexi-careers.onrender.com/admin/api/staff/${staffId}`, {
                     method: 'DELETE'
                 });
 
@@ -1247,7 +1247,7 @@ class AdminPanel {
             if (priorityFilter && priorityFilter !== 'all') params.append('priority', priorityFilter);
             if (assignedFilter && assignedFilter !== 'all') params.append('assigned_staff', assignedFilter);
             
-            const url = `http://localhost:5000/admin/api/employer-requests${params.toString() ? '?' + params.toString() : ''}`;
+            const url = `https://flexi-careers.onrender.com/admin/api/employer-requests${params.toString() ? '?' + params.toString() : ''}`;
             console.log(`Fetching: ${url}`);
             
             const response = await fetch(url);
@@ -1537,7 +1537,7 @@ class AdminPanel {
 
         try {
             // Make API call to assign the request
-            const response = await fetch(`http://localhost:5000/admin/api/employer-requests/${requestId}/assign`, {
+            const response = await fetch(`https://flexi-careers.onrender.com/admin/api/employer-requests/${requestId}/assign`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1710,7 +1710,7 @@ Flexi-Careers Team`;
         }
 
         // Download the actual uploaded resume file
-        const fileUrl = `http://localhost:5000/uploads/resumes/${app.resume_filename}`;
+        const fileUrl = `https://flexi-careers.onrender.com/uploads/resumes/${app.resume_filename}`;
         
         // Create a temporary link to trigger download
         const link = document.createElement('a');
