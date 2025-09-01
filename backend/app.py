@@ -167,25 +167,28 @@ def get_job_details(job_id):
             
         cursor = conn.cursor()
         
-        # Get job with company information
+        # Simplified query first
         cursor.execute("""
             SELECT 
-                j.*,
+                j.id, j.title, j.description, j.requirements, j.responsibilities,
+                j.salary_min, j.salary_max, j.salary_currency, j.salary_type,
+                j.job_type, j.location, j.is_remote, j.experience_level,
+                j.hours_per_week, j.duration, j.skills, j.benefits,
+                j.posted_date, j.application_deadline,
                 c.name as company_name,
                 c.description as company_description,
                 c.industry,
                 c.website as company_website,
                 c.logo_url as company_logo,
                 c.size as company_size,
-                c.location as company_location,
-                c.founded_year,
-                0 as application_count
+                c.location as company_location
             FROM jobs j
             JOIN companies c ON j.company_id = c.id
             WHERE j.id = %s AND j.status = 'active'
         """, (job_id,))
         
         job = cursor.fetchone()
+        conn.close()
         
         if not job:
             return jsonify({'error': 'Job not found'}), 404
@@ -193,17 +196,15 @@ def get_job_details(job_id):
         job_dict = dict(job)
         
         # Parse skills from comma-separated string
-        skills_raw = job_dict['skills']
-        if skills_raw and isinstance(skills_raw, str):
-            # Split comma-separated skills into list
+        skills_raw = job_dict.get('skills', '')
+        if skills_raw:
             skills_list = [skill.strip() for skill in skills_raw.split(',') if skill.strip()]
             job_dict['skills'] = skills_list
-            job_dict['required_skills'] = [{'skill_name': skill, 'is_required': True, 'proficiency_level': 'intermediate'} for skill in skills_list]
         else:
             job_dict['skills'] = []
-            job_dict['required_skills'] = []
         
-        conn.close()
+        # Add application count as 0 for now
+        job_dict['application_count'] = 0
         
         return jsonify({
             'success': True,
@@ -211,8 +212,11 @@ def get_job_details(job_id):
         })
         
     except Exception as e:
-        logger.error(f"Error fetching job details: {e}")
-        return jsonify({'error': 'Failed to fetch job details'}), 500
+        import traceback
+        error_details = traceback.format_exc()
+        logger.error(f"Error fetching job details for job {job_id}: {e}")
+        logger.error(f"Traceback: {error_details}")
+        return jsonify({'error': f'Failed to fetch job details: {str(e)}'}), 500
 
 @app.route('/api/jobs/<int:job_id>/apply', methods=['POST'])
 def apply_for_job(job_id):
