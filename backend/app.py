@@ -6,13 +6,18 @@ Flask application providing REST API for the public website
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import sqlite3
+import psycopg2
+from psycopg2.extras import RealDictCursor
 import os
 import json
 from datetime import datetime
 import uuid
 import logging
 import hashlib
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +27,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend communication
 
 # Database configuration
-DATABASE_PATH = '../flexi_careers.db'
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:npg_NUzJlgD2j0pQ@ep-long-block-adgy76l6-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require')
 UPLOAD_FOLDER = 'uploads/resumes'
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
 
@@ -32,10 +37,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def get_db_connection():
     """Create database connection"""
     try:
-        conn = sqlite3.connect(DATABASE_PATH)
-        conn.row_factory = sqlite3.Row  # Return rows as dictionaries
+        conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
         return conn
-    except sqlite3.Error as e:
+    except psycopg2.Error as e:
         logger.error(f"Database connection error: {e}")
         return None
 
