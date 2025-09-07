@@ -692,21 +692,21 @@ def get_staff():
         
         for s in staff:
             staff_dict = {
-                'id': s[0],
-                'first_name': s[1],
-                'last_name': s[2],
-                'email': s[3],
-                'phone': s[4],
-                'role': s[5],
-                'department': s[6],
-                'hire_date': s[7],
-                'status': s[8],
-                'can_assign_requests': bool(s[9]),
-                'is_admin': bool(s[10]),
-                'user_id': s[11],
-                'username': s[12],
-                'created_at': s[13],
-                'updated_at': s[14]
+                'id': s['id'],
+                'first_name': s['first_name'],
+                'last_name': s['last_name'],
+                'email': s['email'],
+                'phone': s['phone'],
+                'role': s['role'],
+                'department': s['department'],
+                'hire_date': s['hire_date'],
+                'status': s['status'],
+                'can_assign_requests': bool(s['can_assign_requests']) if s['can_assign_requests'] is not None else False,
+                'is_admin': bool(s['is_admin']) if s['is_admin'] is not None else False,
+                'user_id': s['user_id'],
+                'username': s['username'],
+                'created_at': s['created_at'],
+                'updated_at': s['updated_at']
             }
             staff_list.append(staff_dict)
         
@@ -759,9 +759,11 @@ def create_staff():
             cursor.execute("""
                 INSERT INTO admin_users (username, email, password_hash, first_name, last_name, role)
                 VALUES (%s, %s, %s, %s, %s, 'staff')
+                RETURNING id
             """, (username, data['email'], hash_password(password), data['first_name'], data['last_name']))
             
-            user_id = cursor.lastrowid
+            result = cursor.fetchone()
+            user_id = result['id']
         
         # Insert staff member
         cursor.execute("""
@@ -769,6 +771,7 @@ def create_staff():
                 first_name, last_name, email, phone, role, department, hire_date,
                 can_assign_requests, is_admin, user_id, status
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'active')
+            RETURNING id
         """, (
             data['first_name'],
             data['last_name'],
@@ -782,7 +785,8 @@ def create_staff():
             user_id
         ))
         
-        staff_id = cursor.lastrowid
+        result = cursor.fetchone()
+        staff_id = result['id']
         
         conn.commit()
         conn.close()
