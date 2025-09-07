@@ -376,7 +376,8 @@ def submit_employer_request():
             datetime.now().isoformat()
         ))
         
-        request_id = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        request_id = result['id']
         
         conn.commit()
         conn.close()
@@ -467,22 +468,26 @@ def get_platform_stats():
         
         # Active jobs count
         cursor.execute("SELECT COUNT(*) FROM jobs WHERE status = 'active'")
-        stats['active_jobs'] = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        stats['active_jobs'] = result['count']
         
         # Companies count
         cursor.execute("SELECT COUNT(*) FROM companies")
-        stats['companies'] = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        stats['companies'] = result['count']
         
         # Total applications
         cursor.execute("SELECT COUNT(*) FROM applications")
-        stats['total_applications'] = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        stats['total_applications'] = result['count']
         
         # Recent applications (last 30 days)
         cursor.execute("""
             SELECT COUNT(*) FROM applications 
             WHERE applied_at >= CURRENT_DATE - INTERVAL '30 days'
         """)
-        stats['recent_applications'] = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        stats['recent_applications'] = result['count']
         
         # Industries
         cursor.execute("""
@@ -883,7 +888,8 @@ def delete_staff(staff_id):
         
         # Check if staff has assigned requests
         cursor.execute("SELECT COUNT(*) FROM employer_requests WHERE assigned_to = %s", (staff_name,))
-        assigned_count = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        assigned_count = result['count']
         
         if assigned_count > 0:
             return jsonify({
